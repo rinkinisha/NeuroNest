@@ -1,0 +1,244 @@
+/* ============================================================
+   index.css – Global Styles for Revision OS
+   ============================================================ */
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base Reset & Theme ─────────────────────────────────────── */
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-dark-900 text-dark-100 font-sans antialiased;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-dark-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-dark-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-600;
+  }
+}
+
+/* ── Reusable Components ─────────────────────────────────────── */
+@layer components {
+
+  /* Glass Card */
+  .glass-card {
+    @apply bg-dark-800/60 backdrop-blur-md border border-dark-700/50 rounded-2xl;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300;
+  }
+
+  .glass-card-hover:hover {
+    @apply border-primary-500/30;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255,255,255,0.08);
+    transform: translateY(-2px);
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-400 via-violet-400 to-purple-400 bg-clip-text text-transparent;
+  }
+
+  /* Primary Button */
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary-600 to-violet-600 hover:from-primary-500 hover:to-violet-500
+           text-white font-semibold px-6 py-2.5 rounded-xl
+           transition-all duration-200 shadow-lg hover:shadow-glow-sm
+           active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    @apply bg-dark-700/80 hover:bg-dark-700 border border-dark-600/60 hover:border-primary-500/50
+           text-dark-200 hover:text-white font-medium px-6 py-2.5 rounded-xl
+           transition-all duration-200 active:scale-95;
+  }
+
+  /* Danger Button */
+  .btn-danger {
+    @apply bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 hover:border-red-500/60
+           text-red-400 hover:text-red-300 font-medium px-6 py-2.5 rounded-xl
+           transition-all duration-200 active:scale-95;
+  }
+
+  /* Input Field */
+  .input-field {
+    @apply w-full bg-dark-800/80 border border-dark-600/60 rounded-xl px-4 py-3
+           text-dark-100 placeholder-dark-500
+           focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/60
+           transition-all duration-200;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary-500/20 text-primary-300 border border-primary-500/30;
+  }
+
+  .badge-success {
+    @apply badge bg-green-500/20 text-green-400 border border-green-500/30;
+  }
+
+  .badge-warning {
+    @apply badge bg-amber-500/20 text-amber-400 border border-amber-500/30;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-500/20 text-red-400 border border-red-500/30;
+  }
+
+  .badge-info {
+    @apply badge bg-blue-500/20 text-blue-400 border border-blue-500/30;
+  }
+
+  /* Stat Card */
+  .stat-card {
+    @apply glass-card p-6 flex flex-col gap-2 relative overflow-hidden;
+  }
+
+  /* Sidebar Nav Item */
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl
+           text-dark-400 font-medium text-sm
+           hover:bg-dark-700/60 hover:text-white
+           transition-all duration-200 cursor-pointer;
+  }
+
+  .nav-item-active {
+    @apply nav-item bg-gradient-to-r from-primary-600/20 to-violet-600/10
+           text-white border border-primary-500/20;
+  }
+
+  /* Tag Input Chip */
+  .tag-chip {
+    @apply badge-primary cursor-pointer hover:bg-primary-500/30 transition-colors duration-150;
+  }
+
+  /* Page Header */
+  .page-header {
+    @apply mb-8;
+  }
+
+  .page-title {
+    @apply text-2xl md:text-3xl font-bold text-white;
+  }
+
+  .page-subtitle {
+    @apply text-dark-400 mt-1 text-sm;
+  }
+}
+
+/* ── Utility Classes ─────────────────────────────────────────── */
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .border-gradient {
+    border: 1px solid;
+    border-image: linear-gradient(135deg, rgba(99,102,241,0.5), rgba(139,92,246,0.3)) 1;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ── Animations ──────────────────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ── AI Chat Styles ──────────────────────────────────────────── */
+.chat-bubble-user {
+  @apply bg-gradient-to-r from-primary-600 to-violet-600 text-white;
+  border-radius: 18px 18px 4px 18px;
+}
+
+.chat-bubble-ai {
+  @apply bg-dark-700/80 border border-dark-600/40 text-dark-100;
+  border-radius: 18px 18px 18px 4px;
+}
+
+/* Typing indicator dots */
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6366f1;
+  animation: typingPulse 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingPulse {
+  0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+  40% { transform: scale(1.2); opacity: 1; }
+}
+
+/* Progress Ring */
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* Modal overlay */
+.modal-overlay {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  animation: slideUp 0.3s ease-out;
+}
