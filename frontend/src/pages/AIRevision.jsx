@@ -11,19 +11,14 @@ import API from '../api/axios';
 import Loader from '../components/ui/Loader';
 import Button from '../components/ui/Button';
 
-// Import Stages
 import WakeUpStage from '../components/revision/stages/WakeUpStage';
 import MemoryStage from '../components/revision/stages/MemoryStage';
-import MentorStage from '../components/revision/stages/MentorStage';
-import ConnectDotsStage from '../components/revision/stages/ConnectDotsStage';
-import BossBattleStage from '../components/revision/stages/BossBattleStage';
-import ReflectionStage from '../components/revision/stages/ReflectionStage';
 import AIAvatar from '../components/revision/shared/AIAvatar';
 
 const STAGES = [
   'intro',
   'wakeup',
-  'memory',
+  'memory'
 ];
 
 const AIRevision = () => {
@@ -32,11 +27,11 @@ const AIRevision = () => {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [loadingTopics, setLoadingTopics] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  
+
   // Gemini API Key State
   const [apiKey, setApiKey] = useState('');
   const [tempKey, setTempKey] = useState('');
-  
+
   // Journey State
   const [stageIndex, setStageIndex] = useState(0);
   const currentStage = STAGES[stageIndex];
@@ -49,17 +44,55 @@ const AIRevision = () => {
       setTempKey(storedKey);
     }
 
-    const fetchTopics = async () => {
+    const fetchRevisionTopics = async () => {
       try {
-        const { data } = await API.get('/topics');
-        setTopics(data.data);
+        // Fetch reflection data
+        const { data: reflData } = await API.get('/reflections');
+        const reflections = reflData.data || [];
+
+        // Extract unique topics from all reflections
+        const extractedTopicsSet = new Set();
+        reflections.forEach(ref => {
+          if (ref.topicsToRevise && Array.isArray(ref.topicsToRevise)) {
+            ref.topicsToRevise.forEach(topic => {
+              if (topic && topic.trim()) {
+                extractedTopicsSet.add(topic.trim());
+              }
+            });
+          }
+        });
+
+        const extractedTopicsList = Array.from(extractedTopicsSet).map((topicName, index) => ({
+          _id: `refl-${index}`,
+          title: topicName,
+          subject: 'From Reflection'
+        }));
+
+        if (extractedTopicsList.length > 0) {
+          setTopics(extractedTopicsList);
+          setSelectedTopic(extractedTopicsList[0]);
+          setLoadingTopics(false);
+          return;
+        }
+      } catch (err) {
+        console.warn("Failed to load reflections, falling back to general topics:", err);
+      }
+
+      // Fallback: Fetch general topics if no reflection topics exist or if the request fails
+      try {
+        const { data: topicsData } = await API.get('/topics');
+        const fetchedTopics = topicsData.data || [];
+        setTopics(fetchedTopics);
+        if (fetchedTopics.length > 0) {
+          setSelectedTopic(fetchedTopics[0]);
+        }
       } catch {
         // Non-critical
       } finally {
         setLoadingTopics(false);
       }
     };
-    fetchTopics();
+    fetchRevisionTopics();
   }, []);
 
   const handleSaveKey = (e) => {
@@ -79,6 +112,8 @@ const AIRevision = () => {
   const handleNextStage = () => {
     if (stageIndex < STAGES.length - 1) {
       setStageIndex(prev => prev + 1);
+    } else {
+      handleFinish();
     }
   };
 
@@ -99,15 +134,15 @@ const AIRevision = () => {
   if (showVideo) {
     return (
       <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
-        <video 
-          src="/intro-video.mp4" 
-          autoPlay 
+        <video
+          src="/intro-video.mp4"
+          autoPlay
           muted
-          playsInline 
+          playsInline
           onEnded={handleVideoEnd}
           className="w-full h-full object-contain max-w-full max-h-screen"
         />
-        <button 
+        <button
           onClick={handleVideoEnd}
           className="absolute top-6 right-6 text-white/50 hover:text-white bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm z-[110] transition-colors"
         >
@@ -119,21 +154,21 @@ const AIRevision = () => {
 
   return (
     <div className="max-w-4xl mx-auto min-h-[calc(100vh-8rem)] flex flex-col gap-6 py-4">
-      
+
       {/* Top Bar (Progress & Topic Selector) */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shrink-0">
-        
+
         {/* Progress Bar (Only show if started) */}
         {stageIndex > 0 ? (
           <div className="flex-1 max-w-md flex items-center gap-4">
-            <button 
+            <button
               onClick={() => setStageIndex(0)}
               className="text-dark-500 hover:text-white transition-colors"
             >
               × Quit
             </button>
             <div className="flex-1 h-3 bg-dark-800 rounded-full overflow-hidden border border-dark-700/50">
-              <motion.div 
+              <motion.div
                 className="h-full bg-gradient-to-r from-primary-500 to-violet-500 rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
@@ -169,9 +204,8 @@ const AIRevision = () => {
                 <div className="p-2 space-y-1">
                   <button
                     onClick={() => { setSelectedTopic(null); setDropdownOpen(false); }}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                      !selectedTopic ? 'bg-primary-500/20 text-primary-300' : 'text-dark-300 hover:bg-dark-700/60 hover:text-white'
-                    }`}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${!selectedTopic ? 'bg-primary-500/20 text-primary-300' : 'text-dark-300 hover:bg-dark-700/60 hover:text-white'
+                      }`}
                   >
                     General Revision
                   </button>
@@ -187,11 +221,10 @@ const AIRevision = () => {
                       <button
                         key={topic._id}
                         onClick={() => { setSelectedTopic(topic); setDropdownOpen(false); }}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                          selectedTopic?._id === topic._id
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedTopic?._id === topic._id
                             ? 'bg-primary-500/20 text-primary-300'
                             : 'text-dark-300 hover:bg-dark-700/60 hover:text-white'
-                        }`}
+                          }`}
                       >
                         <div className="font-medium truncate">{topic.title}</div>
                         {topic.subject && (
@@ -210,7 +243,7 @@ const AIRevision = () => {
       {/* Main Content Area with Sliding Animations */}
       <div className="flex-1 relative flex flex-col">
         <AnimatePresence mode="wait">
-          
+
           {/* Intro Screen */}
           {currentStage === 'intro' && (
             <motion.div
@@ -223,7 +256,7 @@ const AIRevision = () => {
               {/* 3D Character Background/Header */}
               <div className="w-full max-w-lg h-64 md:h-80 mb-4 relative z-0">
                 <AIAvatar className="w-full h-full" />
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.8, type: "spring" }}
@@ -232,7 +265,7 @@ const AIRevision = () => {
                   <p className="text-xs text-primary-200 font-medium">Hello there! Ready?</p>
                 </motion.div>
               </div>
-              
+
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 relative z-10">
                 Ready to level up?
               </h2>
@@ -249,7 +282,7 @@ const AIRevision = () => {
                     </label>
                     <p className="text-xs text-dark-400">Questions are generated dynamically! Your key is stored securely in your browser.</p>
                     <div className="flex gap-2">
-                      <input 
+                      <input
                         type="password"
                         placeholder="AIzaSy..."
                         value={tempKey}
@@ -270,10 +303,10 @@ const AIRevision = () => {
                   </div>
                 )}
               </div>
-              
-              <Button 
-                size="xl" 
-                onClick={handleNextStage} 
+
+              <Button
+                size="xl"
+                onClick={handleNextStage}
                 disabled={!apiKey}
                 className="w-full max-w-xs shadow-glow-sm relative z-10"
               >
@@ -292,26 +325,6 @@ const AIRevision = () => {
             <MemoryStage key="memory" onComplete={handleNextStage} apiKey={apiKey} topic={selectedTopic} />
           )}
 
-          {/* Mentor Conversation Stage */}
-          {currentStage === 'mentor' && (
-            <MentorStage key="mentor" onComplete={handleNextStage} apiKey={apiKey} topic={selectedTopic} />
-          )}
-
-          {/* Connect the Dots Stage */}
-          {currentStage === 'connect' && (
-            <ConnectDotsStage key="connect" onComplete={handleNextStage} apiKey={apiKey} topic={selectedTopic} />
-          )}
-
-          {/* Boss Battle Stage */}
-          {currentStage === 'boss' && (
-            <BossBattleStage key="boss" onComplete={handleNextStage} apiKey={apiKey} topic={selectedTopic} />
-          )}
-
-          {/* Reflection Stage */}
-          {currentStage === 'reflection' && (
-            <ReflectionStage key="reflection" onFinish={handleFinish} />
-          )}
-          
         </AnimatePresence>
       </div>
     </div>

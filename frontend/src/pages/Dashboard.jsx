@@ -29,21 +29,21 @@ const MemoryHealthRing = ({ percent }) => {
 
   const color =
     percent >= 75 ? '#22c55e' :
-    percent >= 50 ? '#f59e0b' :
-    percent >= 25 ? '#f97316' : '#ef4444';
+      percent >= 50 ? '#f59e0b' :
+        percent >= 25 ? '#f97316' : '#ef4444';
 
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative">
         <svg width={size} height={size}>
-          <circle cx={size/2} cy={size/2} r={radius} fill="none" stroke="#1e293b" strokeWidth={strokeWidth} />
+          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#1e293b" strokeWidth={strokeWidth} />
           <circle
-            cx={size/2} cy={size/2} r={radius} fill="none"
+            cx={size / 2} cy={size / 2} r={radius} fill="none"
             stroke={color} strokeWidth={strokeWidth}
             strokeDasharray={circumference} strokeDashoffset={offset}
             strokeLinecap="round"
             className="progress-ring-circle"
-            transform={`rotate(-90 ${size/2} ${size/2})`}
+            transform={`rotate(-90 ${size / 2} ${size / 2})`}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -86,7 +86,7 @@ const Dashboard = () => {
   const greetingHour = new Date().getHours();
   const greeting =
     greetingHour < 12 ? 'Good morning' :
-    greetingHour < 17 ? 'Good afternoon' : 'Good evening';
+      greetingHour < 17 ? 'Good afternoon' : 'Good evening';
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -102,13 +102,6 @@ const Dashboard = () => {
               : 'No revisions due today – great job!'}
           </p>
         </div>
-        <Button
-          variant="primary"
-          icon={Plus}
-          onClick={() => navigate('/topics')}
-        >
-          Add Topic
-        </Button>
       </div>
 
       {/* Stat Cards Grid */}
@@ -209,61 +202,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Bottom Row: Weak Topics + Top Tags */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <WeakTopicsList topics={stats?.weakTopics ?? []} />
-
-        {/* Top Tags */}
-        <div className="glass-card p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Brain size={16} className="text-violet-400" />
-            <h3 className="text-sm font-semibold text-dark-300">Topic Tags</h3>
-          </div>
-          {stats?.topTags?.length === 0 ? (
-            <div className="flex flex-col items-center py-6 text-center">
-              <p className="text-sm text-dark-500">No tags yet</p>
-              <p className="text-xs text-dark-600 mt-1">Add tags when creating topics</p>
-            </div>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {stats?.topTags?.map(({ tag, count }) => (
-                <div
-                  key={tag}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-dark-800/60 border border-dark-700/40 hover:border-primary-500/30 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/topics?tag=${tag}`)}
-                >
-                  <span className="text-sm text-dark-300">#{tag}</span>
-                  <span className="text-xs bg-primary-500/20 text-primary-400 px-1.5 py-0.5 rounded-full font-bold">
-                    {count}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Recent Sessions */}
-          {stats?.recentSessions?.length > 0 && (
-            <div className="mt-5 pt-4 border-t border-dark-700/40">
-              <p className="text-xs font-semibold text-dark-500 mb-3 flex items-center gap-1.5">
-                <Flame size={12} className="text-amber-400" />
-                Recent Activity
-              </p>
-              <div className="space-y-1.5">
-                {stats.recentSessions.slice(0, 3).map((session) => (
-                  <div key={session._id} className="flex items-center justify-between text-xs">
-                    <span className="text-dark-400 truncate flex-1 mr-2">
-                      {session.topicId?.title || 'Topic'}
-                    </span>
-                    <span className="text-dark-600 shrink-0">
-                      {formatDate(session.createdAt, { month: 'short', day: 'numeric' })}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Bottom row has been removed */}
     </div>
   );
 };

@@ -41,7 +41,7 @@ const QuestionCinematic = ({ question, subtext, code, onReady, accentColor = 'bl
   const glow = glowMap[accentColor] ?? glowMap.blue;
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl bg-dark-900/50" style={{ minHeight: 340 }}>
+    <div className="relative w-full overflow-hidden rounded-2xl bg-dark-900/50 flex flex-col md:flex-row items-center justify-center p-6 md:p-8 gap-6" style={{ minHeight: 360 }}>
       {/* ── Background Styling ───────────────────────── */}
       <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
         <div className="absolute bottom-0 left-0 right-0 h-[45%]"
@@ -50,42 +50,65 @@ const QuestionCinematic = ({ question, subtext, code, onReady, accentColor = 'bl
           style={{ background: 'linear-gradient(180deg, #1f2533 0%, #151821 100%)' }} />
       </div>
 
-      {/* ── GIF Animation ────────────────────────────── */}
-      <AnimatePresence>
-        {(phase === 'enter' || phase === 'center') && (
-          <motion.div
-            key="gif-animation"
-            className="absolute inset-0 flex items-center justify-center z-10"
-            initial={{ x: '-150%', opacity: 0 }}
-            animate={{ x: phase === 'enter' || phase === 'center' ? '0%' : '150%', opacity: 1 }}
-            exit={{ scale: 0, opacity: 0, rotate: 15 }}
-            transition={{ 
-              x: { type: 'spring', stiffness: 80, damping: 15 },
-              exit: { duration: 0.4 }
-            }}
-          >
-            <img 
-              src="/ninja.gif" 
-              alt="Action Animation" 
-              className="w-48 h-48 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" 
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* ── Serving Girl Character ────────────────────── */}
+      <motion.div
+        className="relative z-10 flex items-center justify-center shrink-0"
+        initial={{ x: '-150%', opacity: 0 }}
+        animate={{ 
+          x: phase === 'reveal' ? '0%' : '0%',
+          opacity: 1,
+          scale: phase === 'reveal' ? 0.95 : 1
+        }}
+        transition={{ type: 'spring', stiffness: 85, damping: 15 }}
+      >
+        <div className="relative w-44 h-44 md:w-52 md:h-52">
+          {/* Platter glow and sparkles in reveal phase */}
+          {phase === 'reveal' && (
+            <motion.div 
+              className="absolute inset-0 z-0 pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {/* Glow right behind the platter area */}
+              <div 
+                className="absolute top-[45%] right-[10%] w-16 h-16 rounded-full filter blur-[15px] animate-pulse"
+                style={{ backgroundColor: glow }}
+              />
+            </motion.div>
+          )}
+
+          <img 
+            src="/serving_girl.png" 
+            alt="Serving Girl" 
+            className="w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.3)]"
+          />
+
+          {/* Covered dish tag in preparation phase */}
+          {(phase === 'enter' || phase === 'center') && (
+            <motion.div 
+              className="absolute top-8 right-2 bg-amber-500/90 text-dark-950 font-bold px-3 py-1 rounded-full text-[10px] uppercase tracking-wider shadow-glow-sm border border-amber-300 z-20"
+              animate={{ y: [0, -4, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            >
+              Serving... 🍽️
+            </motion.div>
+          )}
+        </div>
+      </motion.div>
 
       {/* ── Holographic Question Panel ─────────────────── */}
       <AnimatePresence>
         {phase === 'reveal' && (
           <motion.div
             key="holo-panel"
-            className="absolute inset-0 flex items-center justify-center p-6 z-20"
+            className="w-full max-w-md relative z-20"
             initial={{ opacity: 0, scale: 0.8, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.6, type: 'spring', stiffness: 120, damping: 14 }}
           >
-            <div className="w-full max-w-md relative rounded-2xl p-px"
+            <div className="w-full relative rounded-2xl p-px"
               style={{ background: `linear-gradient(135deg, ${glow}, rgba(255,255,255,0.1), ${glow})`,
-                       boxShadow: `0 0 30px ${glow}, 0 0 60px ${glow}33` }}>
+                       boxShadow: `0 0 30px ${glow}33` }}>
               <div className="rounded-2xl p-6 relative overflow-hidden"
                 style={{ background: 'rgba(8,14,30,0.85)', backdropFilter: 'blur(16px)' }}>
 
@@ -106,7 +129,7 @@ const QuestionCinematic = ({ question, subtext, code, onReady, accentColor = 'bl
                     transition={{ repeat: Infinity, duration: 1 }}
                   />
                   <span className="text-xs font-bold uppercase tracking-widest"
-                    style={{ color: glow }}>AI Tutor</span>
+                    style={{ color: glow }}>AI Chef's Special</span>
                 </div>
 
                 {/* Subtext */}
@@ -117,7 +140,7 @@ const QuestionCinematic = ({ question, subtext, code, onReady, accentColor = 'bl
 
                 {/* Question text */}
                 <motion.p
-                  className="text-white font-semibold text-lg leading-snug mb-4"
+                  className="text-white font-semibold text-sm md:text-base leading-snug mb-4"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2, duration: 0.5 }}
@@ -128,7 +151,7 @@ const QuestionCinematic = ({ question, subtext, code, onReady, accentColor = 'bl
                 {/* Code block */}
                 {code && (
                   <motion.div
-                    className="rounded-lg p-4 font-mono text-sm text-green-400 mb-2 overflow-x-auto"
+                    className="rounded-lg p-4 font-mono text-xs text-green-400 mb-2 overflow-x-auto"
                     style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${glow}55` }}
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}

@@ -30,8 +30,73 @@ const Topics = () => {
       if (search) params.set('search', search);
       if (filterTag) params.set('tag', filterTag);
       if (showArchived) params.set('archived', 'true');
-      const { data } = await API.get(`/topics?${params}`);
-      setTopics(data.data);
+      
+      const [topicsRes, reflectionsRes] = await Promise.all([
+        API.get(`/topics?${params}`),
+        API.get('/reflections')
+      ]);
+
+      const dbTopics = topicsRes.data.data;
+      const reflections = reflectionsRes.data.data || [];
+
+      // Extract unique reflection topics
+      const extractedTopicsSet = new Set();
+      const reflectionDates = {}; // Track first reflection creation date per topic
+      reflections.forEach(ref => {
+        if (ref.topicsToRevise && Array.isArray(ref.topicsToRevise)) {
+          ref.topicsToRevise.forEach(topic => {
+            if (topic && topic.trim()) {
+              const name = topic.trim();
+              extractedTopicsSet.add(name);
+              if (!reflectionDates[name]) {
+                reflectionDates[name] = ref.createdAt;
+              }
+            }
+          });
+        }
+      });
+
+      // Filter reflection topics by search query and tags if active
+      let reflectionTopics = Array.from(extractedTopicsSet).map((topicName, index) => ({
+        _id: `refl-${index}`,
+        title: topicName,
+        subject: 'From Reflection',
+        description: 'Extracted automatically from daily reflection logs.',
+        difficulty: 3,
+        memoryScore: 75,
+        revisionCount: 1,
+        totalScheduled: 5,
+        tags: ['reflection'],
+        dateLearnerd: reflectionDates[topicName] || new Date(),
+        isArchived: false
+      }));
+
+      // Apply client-side search/tag filter to reflection topics to match db query
+      if (search) {
+        const lowerSearch = search.toLowerCase();
+        reflectionTopics = reflectionTopics.filter(t => 
+          t.title.toLowerCase().includes(lowerSearch) || 
+          t.description.toLowerCase().includes(lowerSearch)
+        );
+      }
+      if (filterTag) {
+        const lowerTag = filterTag.toLowerCase();
+        reflectionTopics = reflectionTopics.filter(t => 
+          t.tags.some(tg => tg.toLowerCase() === lowerTag) ||
+          lowerTag === 'reflection'
+        );
+      }
+
+      // Hide reflection topics if looking at archived ones
+      if (showArchived) {
+        reflectionTopics = [];
+      }
+
+      // Merge both topic sets, checking for duplicates
+      const dbTitles = new Set(dbTopics.map(t => t.title.toLowerCase().trim()));
+      const uniqueReflectionTopics = reflectionTopics.filter(t => !dbTitles.has(t.title.toLowerCase().trim()));
+
+      setTopics([...dbTopics, ...uniqueReflectionTopics]);
     } catch {
       toast.error('Failed to load topics');
     } finally {

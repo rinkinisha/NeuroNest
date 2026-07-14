@@ -70,12 +70,16 @@ const TopicCard = ({ topic, onEdit, onDelete, onArchive }) => {
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div
-          className="flex-1 min-w-0 cursor-pointer"
-          onClick={() => navigate(`/topics/${topic._id}`)}
+          className={`flex-1 min-w-0 ${topic._id.toString().startsWith('refl-') ? 'cursor-default' : 'cursor-pointer'}`}
+          onClick={() => {
+            if (!topic._id.toString().startsWith('refl-')) {
+              navigate(`/topics/${topic._id}`);
+            }
+          }}
         >
           <div className="flex items-center gap-2 mb-1">
             <BookOpen size={14} className="text-primary-400 shrink-0" />
-            <h3 className="font-semibold text-white text-sm leading-tight line-clamp-2 group-hover:text-primary-300 transition-colors">
+            <h3 className={`font-semibold text-white text-sm leading-tight line-clamp-2 transition-colors ${!topic._id.toString().startsWith('refl-') ? 'group-hover:text-primary-300' : ''}`}>
               {topic.title}
             </h3>
           </div>
@@ -127,36 +131,38 @@ const TopicCard = ({ topic, onEdit, onDelete, onArchive }) => {
       </div>
 
       {/* Action Menu */}
-      <div className="absolute top-3 right-3">
-        <button
-          onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
-          className="p-1.5 rounded-lg text-dark-600 hover:text-dark-300 hover:bg-dark-700/60 opacity-0 group-hover:opacity-100 transition-all duration-200"
-        >
-          <MoreVertical size={15} />
-        </button>
-
-        {menuOpen && (
-          <div
-            className="absolute right-0 top-8 w-40 bg-dark-800 border border-dark-700/60 rounded-xl shadow-xl z-10 py-1"
-            onMouseLeave={() => setMenuOpen(false)}
+      {!topic._id.toString().startsWith('refl-') && (
+        <div className="absolute top-3 right-3">
+          <button
+            onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
+            className="p-1.5 rounded-lg text-dark-600 hover:text-dark-300 hover:bg-dark-700/60 opacity-0 group-hover:opacity-100 transition-all duration-200"
           >
-            {[
-              { icon: Edit,    label: 'Edit',    action: () => { onEdit?.(topic); setMenuOpen(false); }, color: '' },
-              { icon: Archive, label: 'Archive', action: () => { onArchive?.(topic); setMenuOpen(false); }, color: '' },
-              { icon: Trash2,  label: 'Delete',  action: () => { onDelete?.(topic); setMenuOpen(false); }, color: 'text-red-400 hover:bg-red-500/10' },
-            ].map(({ icon: Icon, label, action, color }) => (
-              <button
-                key={label}
-                onClick={action}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm text-dark-300 hover:bg-dark-700/60 hover:text-white transition-colors ${color}`}
-              >
-                <Icon size={14} />
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+            <MoreVertical size={15} />
+          </button>
+
+          {menuOpen && (
+            <div
+              className="absolute right-0 top-8 w-40 bg-dark-800 border border-dark-700/60 rounded-xl shadow-xl z-10 py-1"
+              onMouseLeave={() => setMenuOpen(false)}
+            >
+              {[
+                { icon: Edit,    label: 'Edit',    action: () => { onEdit?.(topic); setMenuOpen(false); }, color: '' },
+                { icon: Archive, label: 'Archive', action: () => { onArchive?.(topic); setMenuOpen(false); }, color: '' },
+                { icon: Trash2,  label: 'Delete',  action: () => { onDelete?.(topic); setMenuOpen(false); }, color: 'text-red-400 hover:bg-red-500/10' },
+              ].map(({ icon: Icon, label, action, color }) => (
+                <button
+                  key={label}
+                  onClick={action}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm text-dark-300 hover:bg-dark-700/60 hover:text-white transition-colors ${color}`}
+                >
+                  <Icon size={14} />
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

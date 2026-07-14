@@ -3,10 +3,11 @@ import { motion } from 'framer-motion';
 import { User, Send, MessagesSquare, Code } from 'lucide-react';
 import Button from '../../ui/Button';
 
-const MentorStage = ({ onComplete }) => {
+const MentorStage = ({ onComplete, topic }) => {
+  const topicName = topic?.title || topic || 'Event Delegation';
   const [messages, setMessages] = useState([
-    { role: 'system', content: 'Persona: Senior Developer. Topic: Event Delegation.' },
-    { role: 'assistant', content: 'Alright junior, let\'s talk about Event Delegation. Explain it to me simply.' }
+    { role: 'system', content: `Persona: Senior Developer. Topic: ${topicName}.` },
+    { role: 'assistant', content: `Alright junior, let's talk about ${topicName}. Explain it to me simply.` }
   ]);
   const [input, setInput] = useState('');
   const [step, setStep] = useState(0);

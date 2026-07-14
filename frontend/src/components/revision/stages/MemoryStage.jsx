@@ -50,6 +50,11 @@ const MemoryStage = ({ onComplete, apiKey, topic }) => {
       <div className="h-full flex flex-col items-center justify-center text-purple-400 gap-4">
         <Loader2 size={40} className="animate-spin" />
         <p className="animate-pulse">Gemini is generating 5 deep-recall questions...</p>
+        <img 
+          src="/ninja.gif" 
+          alt="Loading animation" 
+          className="w-48 h-48 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] mt-2"
+        />
       </div>
     );
   }

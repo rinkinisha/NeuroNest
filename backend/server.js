@@ -40,6 +40,8 @@ app.use('/api/dashboard',   require('./routes/dashboardRoutes'));
 // ── Stage 5 & 6 ──────────────────────────────────────────────────────────────
 app.use('/api/missions',    require('./routes/missionRoutes'));
 app.use('/api/boss-battle', require('./routes/bossBattleRoutes'));
+app.use('/api/goals',       require('./routes/goalRoutes'));
+app.use('/api/reflections', require('./routes/reflectionRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => {
