@@ -12,7 +12,7 @@ const XPBar = ({ totalXp, maxXp = 300, comboMultiplier = 1, comboActive = false 
     <div className="flex items-center gap-3">
       {/* XP Icon */}
       <div className="flex items-center gap-1.5 shrink-0">
-        <Zap size={16} className="text-amber-400" />
+        <Zap size={16} className="text-primary-400" />
         <span className="text-sm font-bold text-white tabular-nums">{totalXp}</span>
         <span className="text-xs text-dark-500">XP</span>
       </div>
@@ -20,16 +20,16 @@ const XPBar = ({ totalXp, maxXp = 300, comboMultiplier = 1, comboActive = false 
       {/* XP Bar */}
       <div className="flex-1 h-3 bg-dark-700 rounded-full overflow-hidden relative">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-500"
-          style={{ width: `${pct}%`, boxShadow: '0 0 8px rgba(245,158,11,0.5)' }}
+          className="h-full rounded-full bg-primary-500"
+          style={{ width: `${pct}%` }}
         />
       </div>
 
       {/* Combo Badge */}
       {comboActive && comboMultiplier > 1 && (
-        <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-red-500/20 border border-red-500/40 animate-bounce shrink-0">
-          <Flame size={12} className="text-red-400" />
-          <span className="text-xs font-bold text-red-400">{comboMultiplier}× COMBO</span>
+        <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-primary-500/20 border border-primary-500/40 shrink-0">
+          <Flame size={12} className="text-primary-400" />
+          <span className="text-xs font-bold text-primary-400">{comboMultiplier}× COMBO</span>
         </div>
       )}
     </div>

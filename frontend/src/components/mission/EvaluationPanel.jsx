@@ -15,7 +15,7 @@ const ScoreBar = ({ label, score, max, color }) => {
       </div>
       <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all duration-700 ${color}`}
+          className={`h-full rounded-full ${color}`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -24,10 +24,10 @@ const ScoreBar = ({ label, score, max, color }) => {
 };
 
 const gradeConfig = (score) => {
-  if (score >= 85) return { label: 'Excellent',  color: 'text-emerald-400', ring: 'text-emerald-400' };
-  if (score >= 70) return { label: 'Good',        color: 'text-green-400',   ring: 'text-green-400'   };
-  if (score >= 55) return { label: 'Fair',        color: 'text-amber-400',   ring: 'text-amber-400'   };
-  return              { label: 'Needs Work',    color: 'text-red-400',     ring: 'text-red-400'     };
+  if (score >= 85) return { label: 'Excellent',  color: 'text-white', ring: 'text-white' };
+  if (score >= 70) return { label: 'Good',        color: 'text-primary-300',   ring: 'text-primary-300'   };
+  if (score >= 55) return { label: 'Fair',        color: 'text-dark-200',   ring: 'text-dark-200'   };
+  return              { label: 'Needs Work',    color: 'text-dark-400',     ring: 'text-dark-400'     };
 };
 
 const EvaluationPanel = ({ evaluation }) => {
@@ -36,14 +36,14 @@ const EvaluationPanel = ({ evaluation }) => {
   const grade = gradeConfig(totalScore);
 
   const scoreItems = [
-    { label: 'Logic',          score: scores.logic,         max: 30, color: 'bg-blue-500'    },
-    { label: 'Concept Usage',  score: scores.conceptUsage,  max: 30, color: 'bg-violet-500'  },
-    { label: 'Readability',    score: scores.readability,   max: 20, color: 'bg-cyan-500'     },
-    { label: 'Best Practices', score: scores.bestPractices, max: 20, color: 'bg-emerald-500'  },
+    { label: 'Logic',          score: scores.logic,         max: 30, color: 'bg-primary-300'    },
+    { label: 'Concept Usage',  score: scores.conceptUsage,  max: 30, color: 'bg-primary-400'  },
+    { label: 'Readability',    score: scores.readability,   max: 20, color: 'bg-primary-500'     },
+    { label: 'Best Practices', score: scores.bestPractices, max: 20, color: 'bg-primary-600'  },
   ];
 
   return (
-    <div className="glass-card p-6 space-y-6 animate-fade-in">
+    <div className="glass-card p-6 space-y-6">
       {/* Total Score */}
       <div className="flex items-center gap-5">
         {/* Circular Score Ring */}
@@ -92,13 +92,13 @@ const EvaluationPanel = ({ evaluation }) => {
       {strengths?.length > 0 && (
         <div>
           <h4 className="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2.5 flex items-center gap-2">
-            <CheckCircle2 size={13} className="text-emerald-400" />
+            <CheckCircle2 size={13} className="text-primary-400" />
             Strengths
           </h4>
           <ul className="space-y-1.5">
             {strengths.map((s, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-dark-200">
-                <CheckCircle2 size={14} className="text-emerald-400 shrink-0 mt-0.5" />
+                <CheckCircle2 size={14} className="text-primary-400 shrink-0 mt-0.5" />
                 {s}
               </li>
             ))}
@@ -110,13 +110,13 @@ const EvaluationPanel = ({ evaluation }) => {
       {weaknesses?.length > 0 && (
         <div>
           <h4 className="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2.5 flex items-center gap-2">
-            <XCircle size={13} className="text-red-400" />
+            <XCircle size={13} className="text-dark-400" />
             Areas to Improve
           </h4>
           <ul className="space-y-1.5">
             {weaknesses.map((w, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-dark-200">
-                <XCircle size={14} className="text-red-400 shrink-0 mt-0.5" />
+                <XCircle size={14} className="text-dark-400 shrink-0 mt-0.5" />
                 {w}
               </li>
             ))}

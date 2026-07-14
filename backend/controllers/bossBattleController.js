@@ -164,7 +164,7 @@ const submitBossBattle = asyncHandler(async (req, res) => {
 
   const totalAnswered   = battle.answers.length;
   const correctAnswers  = battle.answers.filter((a) => a.isCorrect).length;
-  const accuracy        = totalAnswered > 0 ? (correctAnswered / totalAnswered) * 100 : 0;
+  const accuracy        = totalAnswered > 0 ? (correctAnswers / totalAnswered) * 100 : 0;
   const avgResponseTime = totalAnswered > 0
     ? battle.answers.reduce((sum, a) => sum + a.responseTimeMs, 0) / totalAnswered
     : 0;

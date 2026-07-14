@@ -11,18 +11,18 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 
 // Pages
-import Login        from './pages/Login';
-import Signup       from './pages/Signup';
-import Dashboard    from './pages/Dashboard';
-import Topics       from './pages/Topics';
-import TopicDetail  from './pages/TopicDetail';
-import Revisions    from './pages/Revisions';
-import AIRevision   from './pages/AIRevision';
-import History      from './pages/History';
-import NotFound     from './pages/NotFound';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
+import Topics from './pages/Topics';
+import TopicDetail from './pages/TopicDetail';
+import Revisions from './pages/Revisions';
+import AIRevision from './pages/AIRevision';
+import History from './pages/History';
+import NotFound from './pages/NotFound';
 // Stage 5 & 6
 import MissionChallenge from './pages/MissionChallenge';
-import BossBattle       from './pages/BossBattle';
+import BossBattle from './pages/BossBattle';
 
 const App = () => {
   return (
@@ -57,15 +57,15 @@ const App = () => {
 
           {/* ── Protected Routes (with Sidebar + Navbar layout) ─── */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard"    element={<Dashboard />} />
-            <Route path="/topics"       element={<Topics />} />
-            <Route path="/topics/:id"   element={<TopicDetail />} />
-            <Route path="/revisions"    element={<Revisions />} />
-            <Route path="/ai-revision"  element={<AIRevision />} />
-            <Route path="/history"      element={<History />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/topics" element={<Topics />} />
+            <Route path="/topics/:id" element={<TopicDetail />} />
+            <Route path="/revisions" element={<Revisions />} />
+            <Route path="/ai-revision" element={<AIRevision />} />
+            <Route path="/history" element={<History />} />
             {/* Stage 5 & 6 */}
-            <Route path="/mission"      element={<MissionChallenge />} />
-            <Route path="/boss-battle"  element={<BossBattle />} />
+            <Route path="/mission" element={<MissionChallenge />} />
+            <Route path="/boss-battle" element={<BossBattle />} />
           </Route>
 
           {/* ── Default Redirects ───────────────────────────────── */}

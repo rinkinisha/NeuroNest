@@ -62,29 +62,30 @@ const AnswerFeedback = ({ result, onContinue }) => {
 
 // ── Results Screen ────────────────────────────────────────────────────────────
 const ResultsScreen = ({ battle, onRestart }) => {
-  const accuracy      = battle.accuracy || 0;
-  const grade         = accuracy >= 80 ? { label: 'Legendary!', color: 'text-amber-400', emoji: '🏆' }
-                      : accuracy >= 60 ? { label: 'Strong!',    color: 'text-emerald-400', emoji: '⚡' }
-                      : accuracy >= 40 ? { label: 'Keep Going', color: 'text-blue-400', emoji: '💪' }
-                      :                  { label: 'Try Again',  color: 'text-red-400', emoji: '🔥' };
+  const grade         = accuracy >= 80 ? { label: 'Legendary', color: 'text-white', icon: Trophy }
+                      : accuracy >= 60 ? { label: 'Strong',    color: 'text-white', icon: Zap }
+                      : accuracy >= 40 ? { label: 'Keep Going', color: 'text-dark-200', icon: Target }
+                      :                  { label: 'Try Again',  color: 'text-dark-300', icon: Flame };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Score Hero */}
       <div className="glass-card p-8 text-center space-y-4">
-        <div className="text-5xl">{grade.emoji}</div>
+        <div className="flex justify-center mb-2">
+          <grade.icon size={48} className={grade.color} />
+        </div>
         <div>
           <h2 className={`text-3xl font-black ${grade.color}`}>{grade.label}</h2>
           <p className="text-dark-400 text-sm mt-1">Boss Battle Complete</p>
         </div>
         <div className="grid grid-cols-3 gap-4 mt-2">
           {[
-            { icon: Zap,    label: 'XP Earned',   value: battle.totalXp,           color: 'text-amber-400'  },
-            { icon: Target, label: 'Accuracy',     value: `${accuracy.toFixed(1)}%`, color: 'text-emerald-400' },
-            { icon: Flame,  label: 'Best Combo',   value: `${battle.maxCombo}x`,    color: 'text-red-400'    },
+            { icon: Zap,    label: 'XP Earned',   value: battle.totalXp,           color: 'text-white'  },
+            { icon: Target, label: 'Accuracy',     value: `${accuracy.toFixed(1)}%`, color: 'text-white' },
+            { icon: Flame,  label: 'Best Combo',   value: `${battle.maxCombo}x`,    color: 'text-white'    },
           ].map(({ icon: Icon, label, value, color }) => (
             <div key={label} className="bg-dark-800/60 rounded-xl p-3 border border-dark-700/40">
-              <Icon size={18} className={`${color} mx-auto mb-1`} />
+              <Icon size={18} className={`${color} mx-auto mb-1 opacity-80`} />
               <p className={`text-xl font-black ${color}`}>{value}</p>
               <p className="text-xs text-dark-500">{label}</p>
             </div>
@@ -92,14 +93,14 @@ const ResultsScreen = ({ battle, onRestart }) => {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-dark-800/60 rounded-xl p-3 border border-dark-700/40">
-            <Clock size={16} className="text-blue-400 mx-auto mb-1" />
+            <Clock size={16} className="text-white mx-auto mb-1 opacity-80" />
             <p className="text-base font-bold text-white">
               {Math.round(battle.avgResponseTimeMs / 1000)}s avg
             </p>
             <p className="text-xs text-dark-500">Response Time</p>
           </div>
           <div className="bg-dark-800/60 rounded-xl p-3 border border-dark-700/40">
-            <Trophy size={16} className="text-violet-400 mx-auto mb-1" />
+            <Trophy size={16} className="text-white mx-auto mb-1 opacity-80" />
             <p className="text-base font-bold text-white">
               {battle.correctCount} / {battle.questions?.length}
             </p>
@@ -110,14 +111,14 @@ const ResultsScreen = ({ battle, onRestart }) => {
 
       {/* Weak Topics */}
       {battle.weakTopicsDetected?.length > 0 && (
-        <div className="glass-card p-5 border border-amber-500/20">
-          <h3 className="text-sm font-semibold text-amber-300 flex items-center gap-2 mb-3">
-            <TrendingDown size={15} />
+        <div className="glass-card p-5 border border-dark-700">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-3">
+            <TrendingDown size={15} className="opacity-80" />
             Topics Needing Revision
           </h3>
           <div className="flex flex-wrap gap-2">
             {battle.weakTopicsDetected.map((t) => (
-              <span key={t} className="badge bg-amber-500/15 text-amber-300 border border-amber-500/25">{t}</span>
+              <span key={t} className="badge bg-dark-700 text-dark-200 border border-dark-600">{t}</span>
             ))}
           </div>
         </div>
@@ -125,9 +126,9 @@ const ResultsScreen = ({ battle, onRestart }) => {
 
       {/* Next Revision */}
       {battle.nextRevisionDate && (
-        <div className="glass-card p-5 border border-primary-500/20">
-          <h3 className="text-sm font-semibold text-primary-300 flex items-center gap-2 mb-1">
-            <Calendar size={15} />
+        <div className="glass-card p-5 border border-dark-700">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-2 mb-1">
+            <Calendar size={15} className="opacity-80" />
             Recommended Next Revision
           </h3>
           <p className="text-dark-300 text-sm">
@@ -188,7 +189,7 @@ const BossBattle = () => {
       setTotalXp(0);
       setStep('battle');
       answerStartRef.current = Date.now();
-      toast.success('Battle started! 🗡️');
+      toast.success('Battle started!');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to start battle.');
     } finally {
@@ -275,17 +276,17 @@ const BossBattle = () => {
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Swords className="text-red-400" size={24} />
+          <Swords className="text-primary-400" size={24} />
           Boss Battle
         </h1>
-        <p className="text-dark-400 text-sm mt-1">Stage 6 – Rapid recall under time pressure. 15 questions. Prove your mastery.</p>
+        <p className="text-dark-400 text-sm mt-1">Stage 6 – Rapid recall under time pressure. Prove your mastery.</p>
       </div>
 
       {/* ── SETUP ───────────────────────────────────────────────────────────── */}
       {step === 'setup' && (
         <div className="glass-card p-6 space-y-5">
           <h2 className="font-semibold text-white flex items-center gap-2">
-            <Sparkles size={16} className="text-red-400" />
+            <Sparkles size={16} className="text-primary-400" />
             Battle Configuration
           </h2>
 
@@ -295,9 +296,9 @@ const BossBattle = () => {
             <div className="flex flex-wrap gap-2">
               {PHASES.map((p) => (
                 <button key={p} onClick={() => setPhase(p)}
-                  className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-sm border ${
                     phase === p
-                      ? 'bg-red-500/20 border-red-500/50 text-red-300'
+                      ? 'bg-primary-500/20 border-primary-500/60 text-primary-300'
                       : 'bg-dark-800/60 border-dark-700/40 text-dark-400 hover:text-white'
                   }`}>{p}</button>
               ))}
@@ -307,14 +308,14 @@ const BossBattle = () => {
           {/* Weak Concepts */}
           <div>
             <label className="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2 block">
-              Weak Concepts <span className="text-red-400">*</span>
+              Weak Concepts <span className="text-primary-400">*</span>
             </label>
             <div className="flex flex-wrap gap-2">
               {CONCEPT_OPTIONS.map((c) => (
                 <button key={c} onClick={() => toggleConcept(c, weakConcepts, setWeakConcepts)}
-                  className={`px-2.5 py-1 rounded-lg text-xs border transition-all ${
+                  className={`px-2.5 py-1 rounded-lg text-xs border ${
                     weakConcepts.includes(c)
-                      ? 'bg-red-500/20 border-red-500/50 text-red-300'
+                      ? 'bg-primary-500/20 border-primary-500/60 text-primary-300'
                       : 'bg-dark-800/60 border-dark-700/40 text-dark-400 hover:text-white'
                   }`}>{c}</button>
               ))}
@@ -324,14 +325,14 @@ const BossBattle = () => {
           {/* Strong Concepts */}
           <div>
             <label className="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2 block">
-              Strong Concepts <span className="text-green-400">*</span>
+              Strong Concepts <span className="text-primary-400">*</span>
             </label>
             <div className="flex flex-wrap gap-2">
               {CONCEPT_OPTIONS.map((c) => (
                 <button key={c} onClick={() => toggleConcept(c, strongConcepts, setStrongConcepts)}
-                  className={`px-2.5 py-1 rounded-lg text-xs border transition-all ${
+                  className={`px-2.5 py-1 rounded-lg text-xs border ${
                     strongConcepts.includes(c)
-                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
+                      ? 'bg-primary-500/20 border-primary-500/60 text-primary-300'
                       : 'bg-dark-800/60 border-dark-700/40 text-dark-400 hover:text-white'
                   }`}>{c}</button>
               ))}
@@ -346,16 +347,14 @@ const BossBattle = () => {
               { label: 'Combo Bonus', icon: Flame   },
             ].map(({ label, icon: Icon }) => (
               <div key={label} className="flex items-center gap-2 text-dark-300 text-xs">
-                <Icon size={14} className="text-red-400 shrink-0" />
+                <Icon size={14} className="text-dark-400 shrink-0" />
                 {label}
               </div>
             ))}
           </div>
 
           <button onClick={handleStart} disabled={generating}
-            className="w-full flex items-center gap-2 justify-center py-3 rounded-xl font-semibold text-white
-              bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500
-              transition-all duration-200 shadow-lg disabled:opacity-50">
+            className="btn-primary w-full flex items-center gap-2 justify-center py-3">
             {generating
               ? <><Loader2 size={16} className="animate-spin" /> Generating Battle...</>
               : <><Swords size={16} /> Begin Boss Battle</>}
@@ -382,8 +381,8 @@ const BossBattle = () => {
               {/* Progress dots */}
               <div className="flex gap-1 flex-wrap">
                 {battle.questions.map((_, i) => (
-                  <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${
-                    i < currentQ ? 'bg-primary-500' : i === currentQ ? 'bg-amber-400' : 'bg-dark-700'
+                  <div key={i} className={`h-1.5 flex-1 rounded-full ${
+                    i < currentQ ? 'bg-primary-500' : i === currentQ ? 'bg-primary-400 opacity-50' : 'bg-dark-700'
                   }`} />
                 ))}
               </div>

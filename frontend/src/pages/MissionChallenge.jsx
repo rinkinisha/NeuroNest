@@ -192,7 +192,7 @@ const MissionChallenge = () => {
                 <div className="flex flex-wrap gap-2">
                   {PHASES.map((p) => (
                     <button key={p} onClick={() => setPhase(p)}
-                      className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${
+                      className={`px-3 py-1.5 rounded-lg text-sm border ${
                         phase === p
                           ? 'bg-primary-500/20 border-primary-500/60 text-primary-300'
                           : 'bg-dark-800/60 border-dark-700/40 text-dark-400 hover:text-white'
@@ -205,7 +205,7 @@ const MissionChallenge = () => {
                 <div className="flex flex-wrap gap-2">
                   {DIFFICULTIES.map((d) => (
                     <button key={d} onClick={() => setDifficulty(d)}
-                      className={`px-3 py-1.5 rounded-lg text-sm border transition-all capitalize ${
+                      className={`px-3 py-1.5 rounded-lg text-sm border capitalize ${
                         difficulty === d
                           ? 'bg-primary-500/20 border-primary-500/60 text-primary-300'
                           : 'bg-dark-800/60 border-dark-700/40 text-dark-400 hover:text-white'
@@ -228,15 +228,15 @@ const MissionChallenge = () => {
             {/* Weak Concepts */}
             <div>
               <label className="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2 block">
-                Weak Concepts <span className="text-red-400">*</span>
+                Weak Concepts <span className="text-primary-400">*</span>
                 <span className="text-dark-500 ml-1 normal-case">(will be reinforced)</span>
               </label>
               <div className="flex flex-wrap gap-2">
                 {CONCEPT_OPTIONS.map((c) => (
                   <button key={c} onClick={() => toggleConcept(c, weakConcepts, setWeakConcepts)}
-                    className={`px-3 py-1 rounded-lg text-xs border transition-all ${
+                    className={`px-3 py-1 rounded-lg text-xs border ${
                       weakConcepts.includes(c)
-                        ? 'bg-red-500/20 border-red-500/50 text-red-300'
+                        ? 'bg-primary-500/20 border-primary-500/60 text-primary-300'
                         : 'bg-dark-800/60 border-dark-700/40 text-dark-400 hover:text-white'
                     }`}>{c}</button>
                 ))}
@@ -246,15 +246,15 @@ const MissionChallenge = () => {
             {/* Strong Concepts */}
             <div>
               <label className="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2 block">
-                Strong Concepts <span className="text-green-400">*</span>
+                Strong Concepts <span className="text-primary-400">*</span>
                 <span className="text-dark-500 ml-1 normal-case">(used as foundation)</span>
               </label>
               <div className="flex flex-wrap gap-2">
                 {CONCEPT_OPTIONS.map((c) => (
                   <button key={c} onClick={() => toggleConcept(c, strongConcepts, setStrongConcepts)}
-                    className={`px-3 py-1 rounded-lg text-xs border transition-all ${
+                    className={`px-3 py-1 rounded-lg text-xs border ${
                       strongConcepts.includes(c)
-                        ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
+                        ? 'bg-primary-500/20 border-primary-500/60 text-primary-300'
                         : 'bg-dark-800/60 border-dark-700/40 text-dark-400 hover:text-white'
                     }`}>{c}</button>
                 ))}
@@ -298,7 +298,7 @@ const MissionChallenge = () => {
               <div className="flex items-center justify-between px-4 py-2.5 border-b border-dark-700/50 bg-dark-800/80">
                 <span className="text-xs text-dark-400 font-mono">mission.js</span>
                 <button onClick={() => saveDraft(false)} disabled={saving}
-                  className="flex items-center gap-1.5 text-xs text-dark-400 hover:text-white transition-colors">
+                  className="flex items-center gap-1.5 text-xs text-dark-400 hover:text-white">
                   {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
                   Save Draft
                 </button>
