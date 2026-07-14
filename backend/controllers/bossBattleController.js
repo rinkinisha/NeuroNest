@@ -5,7 +5,7 @@
 
 const asyncHandler   = require('express-async-handler');
 const BossBattle     = require('../models/BossBattle');
-const geminiService  = require('../services/geminiService');
+const { QuestionGenerator, EvaluationEngine, AnalyticsEngine } = require('../services/ai');
 const masteryService = require('../services/masteryService');
 
 // XP multipliers for combos
@@ -32,7 +32,7 @@ const generateBossBattle = asyncHandler(async (req, res) => {
     throw new Error('phase, weakConcepts, and strongConcepts are required.');
   }
 
-  const questions = await geminiService.generateBossBattle({
+  const questions = await QuestionGenerator.generateBossBattleQuestions({
     phase,
     weakConcepts,
     strongConcepts,
@@ -177,21 +177,24 @@ const submitBossBattle = asyncHandler(async (req, res) => {
 
   // Gemini evaluation for weak topic detection + mastery deltas
   try {
-    const evaluation = await geminiService.evaluateBossBattle({
+    const rawEvaluation = await EvaluationEngine.evaluateBossBattle({
       questions: battle.questions,
       answers:   battle.answers,
       accuracy:  battle.accuracy,
+      avgResponseTimeMs: battle.avgResponseTimeMs
     });
 
-    battle.weakTopicsDetected = evaluation.weakTopics || [];
+    const analytics = AnalyticsEngine.processBattleAnalytics(rawEvaluation, battle);
+
+    battle.weakTopicsDetected = analytics.weakTopicsDetected;
     battle.nextRevisionDate   = masteryService.calculateNextRevisionDate(battle.accuracy);
 
     // Update topic mastery
     masteryService
-      .updateBattleMastery(req.user._id, evaluation, battle.topicIds)
+      .updateBattleMastery(req.user._id, analytics, battle.topicIds)
       .catch((err) => console.error('Battle mastery update failed:', err.message));
 
-    battle._evaluationFeedback = evaluation.feedback; // Transient – added to response
+    battle._evaluationFeedback = analytics.feedback; // Transient – added to response
 
   } catch (err) {
     console.error('Battle evaluation failed:', err.message);

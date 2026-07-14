@@ -7,7 +7,7 @@ const asyncHandler = require('express-async-handler');
 const Mission       = require('../models/Mission');
 const MissionAttempt = require('../models/MissionAttempt');
 const Topic         = require('../models/Topic');
-const geminiService = require('../services/geminiService');
+const { QuestionGenerator, EvaluationEngine } = require('../services/ai');
 const masteryService = require('../services/masteryService');
 
 // ── POST /api/missions/generate ───────────────────────────────────────────────
@@ -20,7 +20,7 @@ const generateMission = asyncHandler(async (req, res) => {
     throw new Error('phase, weakConcepts, and strongConcepts are required.');
   }
 
-  const missionData = await geminiService.generateMission({
+  const missionData = await QuestionGenerator.generateMission({
     phase,
     weakConcepts,
     strongConcepts,
@@ -118,7 +118,7 @@ const submitMission = asyncHandler(async (req, res) => {
 
   // Run Gemini evaluation
   try {
-    const evaluation = await geminiService.evaluateCode(mission, code);
+    const evaluation = await EvaluationEngine.evaluateCode(mission, code);
 
     attempt.scores           = evaluation.scores;
     attempt.totalScore       = evaluation.totalScore;

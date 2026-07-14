@@ -62,6 +62,7 @@ const AnswerFeedback = ({ result, onContinue }) => {
 
 // ── Results Screen ────────────────────────────────────────────────────────────
 const ResultsScreen = ({ battle, onRestart }) => {
+  const accuracy      = battle?.accuracy || 0;
   const grade         = accuracy >= 80 ? { label: 'Legendary', color: 'text-white', icon: Trophy }
                       : accuracy >= 60 ? { label: 'Strong',    color: 'text-white', icon: Zap }
                       : accuracy >= 40 ? { label: 'Keep Going', color: 'text-dark-200', icon: Target }
