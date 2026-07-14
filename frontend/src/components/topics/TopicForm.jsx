@@ -11,8 +11,6 @@ import { toInputDate } from '../../utils/dateHelpers';
 const defaultForm = {
   title: '',
   description: '',
-  subject: '',
-  tags: [],
   dateLearnerd: toInputDate(),
   difficulty: 3,
   notes: '',
