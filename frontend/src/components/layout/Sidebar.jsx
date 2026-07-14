@@ -7,15 +7,17 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard, BookOpen, CalendarCheck, Bot, History,
-  LogOut, Zap, ChevronRight, Flame, X
+  LogOut, Zap, ChevronRight, Flame, X, Target, Swords
 } from 'lucide-react';
 
 const navItems = [
-  { to: '/dashboard',  label: 'Dashboard',  icon: LayoutDashboard },
-  { to: '/topics',     label: 'My Topics',  icon: BookOpen },
-  { to: '/revisions',  label: 'Revisions',  icon: CalendarCheck },
-  { to: '/ai-revision',label: 'AI Revision', icon: Bot },
-  { to: '/history',    label: 'History',    icon: History },
+  { to: '/dashboard',    label: 'Dashboard',       icon: LayoutDashboard },
+  { to: '/topics',       label: 'My Topics',       icon: BookOpen },
+  { to: '/revisions',    label: 'Revisions',       icon: CalendarCheck },
+  { to: '/ai-revision',  label: 'AI Revision',     icon: Bot },
+  { to: '/mission',      label: 'Mission',         icon: Target },
+  { to: '/boss-battle',  label: 'Boss Battle',     icon: Swords },
+  { to: '/history',      label: 'History',         icon: History },
 ];
 
 const Sidebar = ({ isOpen, onClose }) => {
