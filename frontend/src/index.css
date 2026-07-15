@@ -227,6 +227,73 @@
   40% { transform: scale(1.2); opacity: 1; }
 }
 
+/* ── Personal Mentor Presence ─────────────────────────────────────────── */
+.mentor-presence {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 76px;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.6rem;
+  border: 1px solid rgba(129, 140, 248, 0.24);
+  border-radius: 1rem;
+  background: linear-gradient(110deg, rgba(79, 70, 229, 0.18), rgba(30, 41, 59, 0.5) 56%, rgba(139, 92, 246, 0.12));
+}
+
+.mentor-avatar {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  overflow: hidden;
+  border: 2px solid rgba(165, 180, 252, 0.8);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%, #f3c9ae 0 24%, transparent 25%), linear-gradient(145deg, #5b4bc4, #1f2857 72%);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12), 0 0 18px rgba(99, 102, 241, 0.24);
+}
+
+.mentor-avatar-active { animation: mentorBreath 1.35s ease-in-out infinite; }
+
+.mentor-hair {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  left: 14px;
+  width: 29px;
+  height: 18px;
+  border-radius: 60% 60% 38% 38%;
+  background: #252044;
+  transform: rotate(-7deg);
+}
+
+.mentor-face {
+  position: absolute;
+  z-index: 1;
+  top: 14px;
+  left: 16px;
+  width: 25px;
+  height: 27px;
+  border-radius: 46% 46% 48% 48%;
+  background: #f3c9ae;
+}
+
+.mentor-eye { position: absolute; top: 11px; width: 3px; height: 3px; border-radius: 50%; background: #2f2442; }
+.mentor-eye-left { left: 6px; }
+.mentor-eye-right { right: 6px; }
+.mentor-smile { position: absolute; left: 8px; top: 17px; width: 9px; height: 4px; border-bottom: 1.5px solid #a75f65; border-radius: 50%; }
+.mentor-jacket { position: absolute; z-index: 0; bottom: -9px; left: 8px; width: 40px; height: 29px; border-radius: 48% 48% 0 0; background: linear-gradient(110deg, #332978, #7254ce); }
+.mentor-headset { position: absolute; z-index: 3; top: 13px; left: 9px; width: 38px; height: 28px; border: 2px solid #b7c4ff; border-bottom-color: transparent; border-radius: 50%; }
+.mentor-headset::after { content: ''; position: absolute; right: -3px; bottom: 3px; width: 9px; height: 2px; border-radius: 99px; background: #b7c4ff; transform: rotate(25deg); }
+
+.mentor-live-badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.18rem 0.45rem; border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 999px; color: #6ee7b7; background: rgba(16, 185, 129, 0.08); font-size: 10px; font-weight: 700; }
+.mentor-status-dot { width: 7px; height: 7px; border-radius: 50%; background: #64748b; }
+.mentor-status-dot-active { background: #a5b4fc; box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.15); animation: mentorPulse 1s ease-in-out infinite; }
+.mentor-cursor { display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: -2px; background: #a5b4fc; animation: mentorCursor 0.7s steps(1) infinite; }
+
+@keyframes mentorBreath { 50% { transform: translateY(-2px); box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.13), 0 0 25px rgba(129, 140, 248, 0.4); } }
+@keyframes mentorPulse { 50% { opacity: 0.45; } }
+@keyframes mentorCursor { 50% { opacity: 0; } }
+
 /* Progress Ring */
 .progress-ring-circle {
   transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
