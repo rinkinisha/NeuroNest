@@ -1,7 +1,3 @@
-/**
- * pages/Topics.jsx – Topic listing with search, filters, and create modal.
- */
-
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Search, Filter, BookOpen, Grid3X3, List } from 'lucide-react';
 import API from '../api/axios';
@@ -11,8 +7,10 @@ import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
 import Loader from '../components/ui/Loader';
 import toast from 'react-hot-toast';
+import { useReflection } from '../context/ReflectionContext';
 
 const Topics = () => {
+  const { fetchReflections } = useReflection();
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formLoading, setFormLoading] = useState(false);
@@ -31,13 +29,13 @@ const Topics = () => {
       if (filterTag) params.set('tag', filterTag);
       if (showArchived) params.set('archived', 'true');
       
-      const [topicsRes, reflectionsRes] = await Promise.all([
+      const [topicsRes, reflectionsData] = await Promise.all([
         API.get(`/topics?${params}`),
-        API.get('/reflections')
+        fetchReflections()
       ]);
 
       const dbTopics = topicsRes.data.data;
-      const reflections = reflectionsRes.data.data || [];
+      const reflections = reflectionsData || [];
 
       // Extract unique reflection topics
       const extractedTopicsSet = new Set();
@@ -173,13 +171,6 @@ const Topics = () => {
             {topics.length} topic{topics.length !== 1 ? 's' : ''} • Each creates 5 revision slots
           </p>
         </div>
-        <Button
-          variant="primary"
-          icon={Plus}
-          onClick={() => setShowCreateModal(true)}
-        >
-          Add Topic
-        </Button>
       </div>
 
       {/* Search + Filter Bar */}
@@ -252,12 +243,9 @@ const Topics = () => {
         <div className="glass-card p-16 text-center">
           <BookOpen size={48} className="text-dark-600 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-dark-300 mb-2">No topics yet</h3>
-          <p className="text-dark-500 mb-6 text-sm">
-            Add your first topic to start the spaced repetition journey
+          <p className="text-dark-500 text-sm">
+            Your topics will be extracted automatically from your daily reflections.
           </p>
-          <Button variant="primary" icon={Plus} onClick={() => setShowCreateModal(true)}>
-            Add Your First Topic
-          </Button>
         </div>
       ) : (
         <div className={

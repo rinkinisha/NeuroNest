@@ -1,8 +1,3 @@
-/**
- * pages/AIRevision.jsx
- * Duolingo-style multi-stage AI Revision journey orchestrator.
- */
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -10,6 +5,7 @@ import { Bot, BookOpen, ChevronDown, Rocket, Key } from 'lucide-react';
 import API from '../api/axios';
 import Loader from '../components/ui/Loader';
 import Button from '../components/ui/Button';
+import { useReflection } from '../context/ReflectionContext';
 
 import WakeUpStage from '../components/revision/stages/WakeUpStage';
 import MemoryStage from '../components/revision/stages/MemoryStage';
@@ -23,6 +19,7 @@ const STAGES = [
 
 const AIRevision = () => {
   const navigate = useNavigate();
+  const { fetchReflections } = useReflection();
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [loadingTopics, setLoadingTopics] = useState(true);
@@ -46,9 +43,8 @@ const AIRevision = () => {
 
     const fetchRevisionTopics = async () => {
       try {
-        // Fetch reflection data
-        const { data: reflData } = await API.get('/reflections');
-        const reflections = reflData.data || [];
+        // Fetch reflection data via context
+        const reflections = await fetchReflections();
 
         // Extract unique topics from all reflections
         const extractedTopicsSet = new Set();

@@ -104,7 +104,7 @@ export const evaluateAnswer = async (apiKey, question, userAnswer) => {
     return {
       isCorrect: userAnswer.length > 5, // basic fallback check
       score: userAnswer.length > 5 ? 50 : 0,
-      feedback: isRateLimit 
+      feedback: isRateLimit
         ? "API Rate Limit Exceeded! Google's free tier allows 15 requests per minute. I've accepted your answer to let you pass, but please wait 60 seconds before submitting the next one!"
         : "Network error checking your answer. We'll accept this for now!"
     };

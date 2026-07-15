@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Target, CheckCircle2, Sparkles, Loader2, BookOpen } from 'lucide-react';
 import Button from '../../ui/Button';
-import API from '../../../api/axios';
+import { useReflection } from '../../../context/ReflectionContext';
 
 const ReflectionStage = ({ onFinish }) => {
+  const { addReflection } = useReflection();
   const [content, setContent] = useState('');
   const [topicsInput, setTopicsInput] = useState('');
   const [goal, setGoal] = useState('');
@@ -29,15 +30,15 @@ const ReflectionStage = ({ onFinish }) => {
       .filter((t) => t.length > 0);
 
     try {
-      await API.post('/reflections', {
-        content: content.trim(),
-        topicsToRevise,
-        goal: goal.trim(),
-      });
-      setSubmitted(true);
-      setTimeout(() => {
-        onFinish();
-      }, 1500);
+      const res = await addReflection(content.trim(), topicsToRevise, goal.trim());
+      if (res.success) {
+        setSubmitted(true);
+        setTimeout(() => {
+          onFinish();
+        }, 1500);
+      } else {
+        setError(res.message || 'Could not save your reflection. Please try again.');
+      }
     } catch (err) {
       console.error('Failed to submit reflection:', err);
       setError('Could not save your reflection. Please try again.');

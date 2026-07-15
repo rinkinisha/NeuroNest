@@ -113,7 +113,7 @@ const Signup = () => {
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  placeholder="John Doe"
+                  placeholder="Rinki"
                   className="input-field"
                   required
                 />
@@ -126,7 +126,7 @@ const Signup = () => {
                   name="email"
                   value={form.email}
                   onChange={handleChange}
-                  placeholder="you@example.com"
+                  placeholder="OGrinki@example.com"
                   className="input-field"
                   required
                 />
