@@ -91,7 +91,7 @@ const presetMockScenarios = {
 // @access  Private
 // ─────────────────────────────────────────────────────────────────────────────
 const chatWithCoach = asyncHandler(async (req, res) => {
-  const { topicId, messages = [], priorConversation = [], chosenRole, apiKey, stage = 1 } = req.body;
+  const { topicId, messages = [], priorConversation = [], chosenRole, apiKey, stage = 1, sessionMemory = '' } = req.body;
 
   if (![1, 2].includes(Number(stage))) {
     res.status(400);
@@ -170,7 +170,13 @@ const chatWithCoach = asyncHandler(async (req, res) => {
     turnInstruction = `\n[System note: This is user turn ${userMsgCount} of 6. Keep the conversation engaging, probe their thinking, and guide them Socratic-style.]`;
   }
 
-  // 4. Construct the system instruction
+  // 4. Session Memory section — injected into the prompt for personalised follow-ups
+  // Only present from the second user turn onward (empty string on first call).
+  const memorySection = sessionMemory
+    ? `\n### Session Memory (Personalisation Context)\nThe following is a live summary of how the student has performed so far in this session. Use it naturally — like a mentor who remembers. Reference past struggles with empathy, not criticism. Celebrate progress where it is evident.\n${sessionMemory}\n`
+    : '';
+
+  // 5. Construct the system instruction
   const previousTopicContext = previousTopics.length
     ? previousTopics.map((topic) => `- ${topic.title}${topic.subject ? ` (${topic.subject})` : ''}${topic.tags?.length ? ` [${topic.tags.join(', ')}]` : ''}`).join('\n')
     : '- No earlier topics are available. Help the learner connect the current topic to foundational JavaScript concepts they may already know.';
@@ -179,73 +185,74 @@ const chatWithCoach = asyncHandler(async (req, res) => {
     : 'No Stage 1 conversation was supplied.';
 
   const stageTwoPrompt = `
-You are the Stage 2 Connected Concepts Coach inside RevisionOS.
-The learner's current topic is "${topicTitle}" (Subject: ${topicSubject}).
+You are an experienced, warm, and adaptive Socratic mentor guiding a student to build a connected mental web for: "${topicTitle}" (Subject: ${topicSubject}).
+Your goal is to help them connect this new topic to earlier concepts they learned, building a strong, unified mental map.
 
-Your job is NOT to teach this topic from scratch or dump an explanation. Help the learner build a connected mental map by linking the current topic to concepts they already know.
-
-### Previously Learned Topics
+### Previously Learned Topics (Use these for connection context)
 ${previousTopicContext}
 
 ### Stage 1 Conversation Context
 ${priorConversationContext}
 
-### Coaching Rules
-1. Ask EXACTLY ONE Socratic connection question per response, then wait for the learner's answer.
-2. Focus on why this concept exists, the problem it solves, its prerequisites, future concepts that depend on it, and how it differs from similar concepts.
-3. Base follow-up questions on the learner's actual response and conversation history. Do not ask a disconnected quiz question.
-4. Never reveal an answer immediately. If the learner struggles, identify the missing prerequisite, give one short hint, and guide them back to that prerequisite before continuing.
-5. Prefer relationships such as variables → execution context → hoisting → TDZ → scope → lexical environment → closures; functions → call stack → callbacks → async; objects → references → mutation/copy; and promises → event loop → microtasks → async/await when they genuinely fit the topic.
-6. Explain WHY a connection exists, not only that it exists. Use a short analogy only when it genuinely makes the relationship clearer.
-7. Be conversational and concise. Do not lecture or provide a long list.
+### Socratic Connection Rules
+1. BE A HUMAN MENTOR, NOT A CHATBOT. Never use robotic phrases like "Here is your next question", "Excellent connection, now let's discuss...", or outputting structured lists of questions. Speak like a senior developer/mentor in a whiteboard session.
+2. SOCRATIC CONNECTION: Ask exactly one connection question at a time. Probe relationships between the current topic and previous concepts (e.g., "How does the lexical scope we discussed in closures relate to execution context?").
+3. ADAPTIVE DIALOGUE & CONTINUITY: Listen carefully to their explanation. Pay close attention to previous answers. Build directly on what the student says. If they state a connection exists, ask them to explain *why* or to give an example. Challenge their logic if they confuse reference or scope behavior.
+4. NO TEXT DUMPS: Keep explanations minimal. Guide them to formulate the connection themselves. Keep responses under 3-4 sentences.
 
 ### Session Ending
-After 4–6 meaningful learner responses, ask the learner to summarize in their own words how the connected concepts fit together. Once they answer that reflection, respond with a brief acknowledgement and include the exact line: "Connected mental map complete." Do not ask another question after that line.
+After 4–6 responses, ask them to summarize the main connection web in their own words. Once they reply, provide a brief feedback/closing and include the exact line: "Connected mental map complete." Do not ask another question after that line.
 
-${userMsgCount >= 6
+${memorySection}${userMsgCount >= 6
     ? '[System note: The learner has had enough turns. Evaluate their final reflection, close the session now, and include "Connected mental map complete.".]'
     : `[System note: This is learner turn ${userMsgCount}. Continue with one well-sequenced connection question.]`}
 `;
 
   const stageOnePrompt = `
-You are an AI Memory Coach inside RevisionOS.
-The student is currently revising the topic: "${topicTitle}" (Subject: ${topicSubject}).
+You are an experienced, warm, and highly adaptive human mentor guiding a student through a Socratic revision of the topic: "${topicTitle}" (Subject: ${topicSubject}).
+You are playing the role of a **${activeRole}**. Adopt this persona's tone, wisdom, and professional background.
 
-Your goal is NOT to conduct an exam or ask a list of disconnected questions.
-Instead, become an interactive mentor and have a natural conversation with the student to strengthen their understanding and long-term memory.
-
-### Your Role for this Session
-You must act as a **${activeRole}** throughout the entire conversation. Stay in character, adapting your tone, vocabulary, and perspective to match this role:
-- Senior Software Engineer: Professional, practical, focuses on best practices, scalability, and code structure.
-- Tech Interviewer: Analytical, structured, asks probing questions, tests edge cases and understanding.
-
-### Instructions
-1. Stay in the role of **${activeRole}** throughout.
-2. Start with one open-ended conceptual question related to the topic: "${topicTitle}".
-3. Ask EXACTLY ONE question in each response. Never ask multiple questions in a single turn. Wait for the student's reply before asking the next question.
-4. Based on the student's response, ask intelligent follow-up questions that:
-   - explore reasoning
-   - identify misconceptions
-   - connect ideas
-   - encourage deeper thinking
-5. Never immediately reveal the answer.
-6. If the student struggles:
-   - Give Hint 1
-   - Wait for another response
-   - Give Hint 2
-   - Ask another guiding question
-   - Only reveal the complete explanation if the student is still unable to answer.
-7. Make the conversation feel like a real mentor discussion, not a quiz.
-8. Use an encouraging tone. Celebrate good reasoning instead of only correct answers.
-9. Keep the conversation going for 4–6 meaningful interactions before concluding.
-
+### Conversation Guidelines
+1. BE A HUMAN MENTOR, NOT A CHATBOT.
+   - Speak exactly like a friendly senior developer mentoring a junior developer.
+   - Never sound like an AI assistant, textbook, or lecturer.
+   - Avoid robotic phrases such as "Here is your next question," "Excellent work," "Let's move on," or "As your mentor."
+   - Your replies should feel like a natural back-and-forth conversation.
+2. THE SOCRATIC METHOD: Your primary tool is the question. Do not dump code or explanations. Instead, ask one focused conceptual question that forces the student to retrieve knowledge or think from first principles.
+3. CONVERSATIONAL CONTINUITY: You MUST pay close attention to previous answers. Build directly on what the student says. If they use a term, probe deeper: "What do you mean by that? How does that actually work under the hood?" Reference their past statements to make the conversation feel like a single continuous stream of thought.
+4. ADAPT & CHALLENGE:
+   - If their answer is correct but simple: ask for a real-world example or challenge their assumptions ("Are you sure that doesn't cause a memory leak? What if...").
+   - If they make a mistake: do not say "Incorrect" or provide the correct answer. Guide them with a gentle counter-question or hypothetical scenario that exposes the flaw in their reasoning.
+   - If they are completely stuck: provide a tiny, curious clue or analogy, and ask a guiding micro-question. Only provide a brief explanation if they explicitly request it or remain stuck after multiple hints.
+5. ONE QUESTION AT A TIME: Never ask more than one question per turn. Keep your replies concise (under 3-4 sentences) to maintain high-energy dialogue.
+6. CELEBRATE THINKING: Appreciate their process and effort. Be supportive and curious.
+### Language & Communication Style
+7. USE SIMPLE ENGLISH:
+   - Always speak in very simple, easy-to-understand English suitable for beginners.
+   - Avoid advanced vocabulary, complex sentence structures, or overly academic language.
+   - Explain ideas using short sentences and everyday words.
+   - If you need to use a technical term (e.g., closure, hoisting, lexical scope), mention the term but explain it in simple language.
+   - Prefer a friendly conversation over formal teaching.
+   - Speak as if you're mentoring a first-year developer or someone who is still learning English.
+   - Keep your questions natural, short, and easy to understand.
+### Natural Conversation
+8. TALK LIKE A REAL PERSON:
+   - Occasionally use natural conversational phrases like:
+     - "Hmm..."
+     - "Interesting."
+     - "That's a good point."
+     - "Let's think about this."
+     - "Can you explain that a little more?"
+     - "Why do you think that?"
+   - Don't use these in every response—use them naturally and sparingly.
+   - Avoid sounding scripted or repetitive.   
 ### Concluding the Session
-When you wrap up, you MUST provide EXACTLY these three points in a clear summary block:
+Keep the session to 4–6 turns. When wrapping up, transition naturally by saying something like: "We've had a great session covering this. Let's do a quick post-session check. Here's a brief breakdown of what we discussed:" and provide EXACTLY these three points in a clear summary block:
 - What the student explained well.
 - What concepts still need improvement.
 - One takeaway to remember.
 
-${turnInstruction}
+${memorySection}${turnInstruction}
 `;
 
   const systemPrompt = Number(stage) === 2 ? stageTwoPrompt : stageOnePrompt;
@@ -291,18 +298,28 @@ ${turnInstruction}
     const result = await model.generateContent({ contents });
     const responseText = result.response.text();
 
+    // Parse emotion prefix if present: e.g. [EMOTION: Proud]
+    let emotion = 'neutral';
+    let cleanText = responseText;
+    const emotionMatch = responseText.match(/^\[EMOTION:\s*([A-Za-z]+)\]/i);
+    if (emotionMatch) {
+      emotion = emotionMatch[1].toLowerCase();
+      cleanText = responseText.replace(/^\[EMOTION:\s*[A-Za-z]+\]\s*/i, '');
+    }
+
     // 7. Check if AI concluded the session (detect presence of the summary block)
-    const hasExplainedWell = /explained well/i.test(responseText);
-    const hasNeedImprovement = /need(s)? improvement/i.test(responseText) || /concepts still/i.test(responseText);
-    const hasTakeaway = /takeaway/i.test(responseText);
+    const hasExplainedWell = /explained well/i.test(cleanText);
+    const hasNeedImprovement = /need(s)? improvement/i.test(cleanText) || /concepts still/i.test(cleanText);
+    const hasTakeaway = /takeaway/i.test(cleanText);
     const isCompleted = Number(stage) === 2
-      ? /connected mental map complete/i.test(responseText)
+      ? /connected mental map complete/i.test(cleanText)
       : hasExplainedWell && hasNeedImprovement && hasTakeaway;
 
     res.json({
       success: true,
       data: {
-        content: responseText,
+        content: cleanText,
+        emotion: emotion,
         chosenRole: activeRole,
         stage: Number(stage),
         isCompleted,
@@ -335,12 +352,21 @@ ${turnInstruction}
         ];
 
         const connectionComplete = userMsgCount >= 6;
+        const fallbackEmotion = connectionComplete
+          ? 'proud'
+          : userMsgCount === 0
+          ? 'neutral'
+          : userMsgCount % 2 === 0
+          ? 'happy'
+          : 'curious';
+
         return res.json({
           success: true,
           data: {
             content: connectionComplete
-              ? '[Connected Concepts Coach - Fallback Mode]\n\nYou have connected the ideas thoughtfully. Connected mental map complete.'
-              : `[Connected Concepts Coach - Fallback Mode]\n\n${connectionQuestions[Math.min(userMsgCount, connectionQuestions.length - 1)]}`,
+              ? 'You have connected the ideas thoughtfully. Connected mental map complete.'
+              : connectionQuestions[Math.min(userMsgCount, connectionQuestions.length - 1)],
+            emotion: fallbackEmotion,
             chosenRole: 'Connected Concepts Coach',
             stage: 2,
             isCompleted: connectionComplete,
@@ -354,10 +380,10 @@ ${turnInstruction}
       
       let replyContent = '';
       let isCompleted = false;
+      let fallbackEmotion = 'curious';
 
       if (userMsgCount >= 5) {
-        replyContent = `[Socratic Coach - Fallback Mode]
-Excellent job working through this topic with me! Let's wrap up our session. Here is a summary of your revision:
+        replyContent = `Excellent job working through this topic with me! Let's wrap up our session. Here is a summary of your revision:
 
 - **What you explained well**: ${scenario.summary.explainedWell}
 - **What concepts still need improvement**: ${scenario.summary.needsImprovement}
@@ -365,16 +391,22 @@ Excellent job working through this topic with me! Let's wrap up our session. Her
 
 Keep practicing, you are doing great!`;
         isCompleted = true;
+        fallbackEmotion = 'proud';
       } else {
         const questionIdx = Math.min(userMsgCount, scenario.questions.length - 1);
-        replyContent = `[Socratic Coach - Fallback Mode]
-${scenario.questions[questionIdx]}`;
+        replyContent = scenario.questions[questionIdx];
+        fallbackEmotion = questionIdx === 0
+          ? 'neutral'
+          : questionIdx % 2 === 0
+          ? 'happy'
+          : 'curious';
       }
 
       return res.json({
         success: true,
         data: {
           content: replyContent,
+          emotion: fallbackEmotion,
           chosenRole: activeRole,
           stage: 1,
           isCompleted,
