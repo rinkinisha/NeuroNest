@@ -1,7 +1,3 @@
-/**
- * pages/Topics.jsx – Topic listing with search, filters, and create modal.
- */
-
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Search, Filter, BookOpen, Grid3X3, List } from 'lucide-react';
 import API from '../api/axios';
@@ -11,8 +7,10 @@ import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
 import Loader from '../components/ui/Loader';
 import toast from 'react-hot-toast';
+import { useReflection } from '../context/ReflectionContext';
 
 const Topics = () => {
+  const { fetchReflections } = useReflection();
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formLoading, setFormLoading] = useState(false);
@@ -30,8 +28,73 @@ const Topics = () => {
       if (search) params.set('search', search);
       if (filterTag) params.set('tag', filterTag);
       if (showArchived) params.set('archived', 'true');
-      const { data } = await API.get(`/topics?${params}`);
-      setTopics(data.data);
+      
+      const [topicsRes, reflectionsData] = await Promise.all([
+        API.get(`/topics?${params}`),
+        fetchReflections()
+      ]);
+
+      const dbTopics = topicsRes.data.data;
+      const reflections = reflectionsData || [];
+
+      // Extract unique reflection topics
+      const extractedTopicsSet = new Set();
+      const reflectionDates = {}; // Track first reflection creation date per topic
+      reflections.forEach(ref => {
+        if (ref.topicsToRevise && Array.isArray(ref.topicsToRevise)) {
+          ref.topicsToRevise.forEach(topic => {
+            if (topic && topic.trim()) {
+              const name = topic.trim();
+              extractedTopicsSet.add(name);
+              if (!reflectionDates[name]) {
+                reflectionDates[name] = ref.createdAt;
+              }
+            }
+          });
+        }
+      });
+
+      // Filter reflection topics by search query and tags if active
+      let reflectionTopics = Array.from(extractedTopicsSet).map((topicName, index) => ({
+        _id: `refl-${index}`,
+        title: topicName,
+        subject: 'From Reflection',
+        description: 'Extracted automatically from daily reflection logs.',
+        difficulty: 3,
+        memoryScore: 75,
+        revisionCount: 1,
+        totalScheduled: 5,
+        tags: ['reflection'],
+        dateLearnerd: reflectionDates[topicName] || new Date(),
+        isArchived: false
+      }));
+
+      // Apply client-side search/tag filter to reflection topics to match db query
+      if (search) {
+        const lowerSearch = search.toLowerCase();
+        reflectionTopics = reflectionTopics.filter(t => 
+          t.title.toLowerCase().includes(lowerSearch) || 
+          t.description.toLowerCase().includes(lowerSearch)
+        );
+      }
+      if (filterTag) {
+        const lowerTag = filterTag.toLowerCase();
+        reflectionTopics = reflectionTopics.filter(t => 
+          t.tags.some(tg => tg.toLowerCase() === lowerTag) ||
+          lowerTag === 'reflection'
+        );
+      }
+
+      // Hide reflection topics if looking at archived ones
+      if (showArchived) {
+        reflectionTopics = [];
+      }
+
+      // Merge both topic sets, checking for duplicates
+      const dbTitles = new Set(dbTopics.map(t => t.title.toLowerCase().trim()));
+      const uniqueReflectionTopics = reflectionTopics.filter(t => !dbTitles.has(t.title.toLowerCase().trim()));
+
+      setTopics([...dbTopics, ...uniqueReflectionTopics]);
     } catch {
       toast.error('Failed to load topics');
     } finally {
@@ -108,13 +171,6 @@ const Topics = () => {
             {topics.length} topic{topics.length !== 1 ? 's' : ''} • Each creates 5 revision slots
           </p>
         </div>
-        <Button
-          variant="primary"
-          icon={Plus}
-          onClick={() => setShowCreateModal(true)}
-        >
-          Add Topic
-        </Button>
       </div>
 
       {/* Search + Filter Bar */}
@@ -187,12 +243,9 @@ const Topics = () => {
         <div className="glass-card p-16 text-center">
           <BookOpen size={48} className="text-dark-600 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-dark-300 mb-2">No topics yet</h3>
-          <p className="text-dark-500 mb-6 text-sm">
-            Add your first topic to start the spaced repetition journey
+          <p className="text-dark-500 text-sm">
+            Your topics will be extracted automatically from your daily reflections.
           </p>
-          <Button variant="primary" icon={Plus} onClick={() => setShowCreateModal(true)}>
-            Add Your First Topic
-          </Button>
         </div>
       ) : (
         <div className={

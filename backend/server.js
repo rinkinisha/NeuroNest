@@ -33,11 +33,16 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // ── Routes ────────────────────────────────────────────────────────────────────
-app.use('/api/auth',      require('./routes/authRoutes'));
-app.use('/api/topics',    require('./routes/topicRoutes'));
-app.use('/api/revisions', require('./routes/revisionRoutes'));
-app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/ai',        require('./routes/aiRoutes'));
+app.use('/api/auth',        require('./routes/authRoutes'));
+app.use('/api/topics',      require('./routes/topicRoutes'));
+app.use('/api/revisions',   require('./routes/revisionRoutes'));
+app.use('/api/dashboard',   require('./routes/dashboardRoutes'));
+// ── Stage 5 & 6 ──────────────────────────────────────────────────────────────
+app.use('/api/missions',    require('./routes/missionRoutes'));
+app.use('/api/boss-battle', require('./routes/bossBattleRoutes'));
+app.use('/api/goals',       require('./routes/goalRoutes'));
+app.use('/api/reflections', require('./routes/reflectionRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

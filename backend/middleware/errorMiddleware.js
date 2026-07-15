@@ -16,6 +16,8 @@ const notFound = (req, res, next) => {
  * errorHandler – Centralized error response formatter
  */
 const errorHandler = (err, req, res, next) => {
+  console.error('\n❌ GLOBAL ERROR:', err);
+  
   // If status is 200 but error thrown, set to 500
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
 

@@ -16,6 +16,11 @@ const Loader = ({ fullPage = false, size = 'md', text = '' }) => {
         className={`${sizes[size]} rounded-full border-dark-600 border-t-primary-500 animate-spin`}
       />
       {text && <p className="text-dark-400 text-sm animate-pulse">{text}</p>}
+      <img 
+        src="/ninja.gif" 
+        alt="Loading animation" 
+        className="w-24 h-24 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] mt-1"
+      />
     </div>
   );
 
@@ -27,6 +32,11 @@ const Loader = ({ fullPage = false, size = 'md', text = '' }) => {
           <p className="text-dark-300 text-sm font-medium animate-pulse">
             {text || 'Loading Revision OS...'}
           </p>
+          <img 
+            src="/ninja.gif" 
+            alt="Loading animation" 
+            className="w-48 h-48 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] mt-2"
+          />
         </div>
       </div>
     );

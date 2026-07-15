@@ -139,7 +139,7 @@ const SessionControls = ({
 );
 
 // ─── AIChat (main component) ──────────────────────────────────────────────────
-const AIChat = ({ topic = null, apiKey = '' }) => {
+const AIChat = ({ topic = null, apiKey = '', onComplete }) => {
   // Session state
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -541,8 +541,7 @@ const AIChat = ({ topic = null, apiKey = '' }) => {
         setChosenRole(data.data.chosenRole);
         if (data.data.isCompleted) {
           setIsCompleted(true);
-          if (activeStage === 1) toast.success('Stage 1 complete! Continue to Stage 2.');
-          else { setShowAssessment(true); toast.success('Connected mental map complete! 🎓'); }
+          toast.success('AI Conversation complete! Save session to continue.');
           disableVoiceSession();
           return;
         }
@@ -607,8 +606,7 @@ const AIChat = ({ topic = null, apiKey = '' }) => {
         setChosenRole(data.data.chosenRole);
         if (data.data.isCompleted) {
           setIsCompleted(true);
-          if (activeStage === 1) toast.success('Stage 1 complete!');
-          else { setShowAssessment(true); toast.success('Connected mental map complete! 🎓'); }
+          toast.success('AI Conversation complete!');
         }
       }
     } catch (err) {
@@ -638,6 +636,7 @@ const AIChat = ({ topic = null, apiKey = '' }) => {
         toast.success('Session saved! Streak updated 🎉');
         setShowAssessment(false);
         clearChat();
+        if (onComplete) onComplete();
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to save session');
@@ -717,34 +716,11 @@ const AIChat = ({ topic = null, apiKey = '' }) => {
       <div className="absolute inset-0 pointer-events-none opacity-[0.025]"
            style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
-      {/* ── Top bar: stage tabs + role badge ── */}
+      {/* ── Top bar: title + role badge + status ── */}
       <div className="relative z-10 flex items-center justify-between gap-3 px-4 py-2.5 border-b border-dark-700/40 bg-dark-900/50 backdrop-blur-sm shrink-0">
-        <div className="flex gap-1.5">
-          {/* Stage 1 tab */}
-          <button
-            onClick={() => activeStage === 2 && clearChat()}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 ${
-              activeStage === 1
-                ? 'bg-primary-500/20 text-primary-300 border border-primary-500/30'
-                : 'text-dark-400 hover:text-dark-200 border border-transparent'
-            }`}
-          >
-            <Sparkles size={12} className="text-primary-400" />
-            Stage 1
-          </button>
-
-          {/* Stage 2 tab */}
-          <button
-            onClick={startStageTwo}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 border ${
-              activeStage === 2
-                ? 'bg-violet-500/20 text-violet-300 border-violet-500/30'
-                : 'text-dark-300 hover:text-white hover:bg-dark-800 border-dark-700/60'
-            }`}
-          >
-            <BookOpen size={12} />
-            Stage 2
-          </button>
+        <div className="flex items-center gap-2">
+          <Sparkles size={14} className="text-primary-400" />
+          <span className="text-xs font-bold text-white uppercase tracking-wider">AI Conversation Coach</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -801,7 +777,7 @@ const AIChat = ({ topic = null, apiKey = '' }) => {
 
         {/* Session complete CTA */}
         {isCompleted && !showAssessment && (
-          <div className="w-full max-w-2xl mx-auto">
+          <div className="w-full max-w-2xl mx-auto animate-fade-in">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-green-500/10 border border-green-500/25">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">
@@ -809,31 +785,19 @@ const AIChat = ({ topic = null, apiKey = '' }) => {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-white">
-                    {activeStage === 1 ? 'Stage 1 Complete!' : 'Mental Map Complete!'}
+                    Conversation Complete!
                   </h4>
                   <p className="text-xs text-dark-400 mt-0.5">
-                    {activeStage === 1
-                      ? 'Continue to Stage 2 to connect this topic or save your session.'
-                      : 'Your connected mental map has been built.'}
+                    Save your conversation session to continue to the next stage of your journey.
                   </p>
                 </div>
               </div>
-              <div className="flex gap-2 w-full sm:w-auto">
-                {activeStage === 1 && (
-                  <button
-                    onClick={startStageTwo}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-violet-500/30 bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 text-xs font-semibold transition-all"
-                  >
-                    Stage 2 <ArrowRight size={13} />
-                  </button>
-                )}
-                <button
-                  onClick={() => setShowAssessment(true)}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-600 to-violet-600 hover:opacity-90 text-white text-xs font-semibold transition-all"
-                >
-                  <CheckCircle size={13} /> Save Session
-                </button>
-              </div>
+              <button
+                onClick={() => setShowAssessment(true)}
+                className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-violet-600 hover:opacity-90 text-white text-xs font-semibold transition-all"
+              >
+                <CheckCircle size={13} /> Save Session
+              </button>
             </div>
           </div>
         )}

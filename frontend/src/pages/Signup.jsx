@@ -2,7 +2,7 @@
  * pages/Signup.jsx – Registration page
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Zap, ArrowRight, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -12,8 +12,14 @@ const Signup = () => {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { signup } = useAuth();
+  const { signup, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const passwordStrength = () => {
     const p = form.password;
@@ -34,9 +40,8 @@ const Signup = () => {
     e.preventDefault();
     if (strength < 2) return;
     setLoading(true);
-    const result = await signup(form.name, form.email, form.password);
+    await signup(form.name, form.email, form.password);
     setLoading(false);
-    if (result.success) navigate('/dashboard');
   };
 
   const features = [
@@ -108,7 +113,7 @@ const Signup = () => {
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  placeholder="John Doe"
+                  placeholder="Rinki"
                   className="input-field"
                   required
                 />
@@ -121,7 +126,7 @@ const Signup = () => {
                   name="email"
                   value={form.email}
                   onChange={handleChange}
-                  placeholder="you@example.com"
+                  placeholder="OGrinki@example.com"
                   className="input-field"
                   required
                 />

@@ -11,11 +11,11 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { to: '/dashboard',  label: 'Dashboard',  icon: LayoutDashboard },
-  { to: '/topics',     label: 'My Topics',  icon: BookOpen },
-  { to: '/revisions',  label: 'Revisions',  icon: CalendarCheck },
-  { to: '/ai-revision',label: 'AI Revision', icon: Bot },
-  { to: '/history',    label: 'History',    icon: History },
+  { to: '/dashboard',    label: 'Dashboard',       icon: LayoutDashboard },
+  { to: '/topics',       label: 'My Topics',       icon: BookOpen },
+  { to: '/revisions',    label: 'Revisions',       icon: CalendarCheck },
+  { to: '/ai-revision',  label: 'AI Revision',     icon: Bot },
+  { to: '/history',      label: 'History',         icon: History },
 ];
 
 const Sidebar = ({ isOpen, onClose }) => {
